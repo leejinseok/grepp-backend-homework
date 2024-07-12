@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   get "hello" => "hello#hello"
 
   post "/api/v1/auth/sign_up" => "auth#sign_up"
+  post "/api/v1/auth/login" => "auth#login"
 
   # Defines the root path route ("/")
   # root "posts#index"
