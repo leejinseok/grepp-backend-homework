@@ -8,4 +8,16 @@ class AuthService
     User.create(email: email, name: name, role: role, password: hash)
   end
 
+  def login(email, password)
+    user_find_by = User.find_by(email: email)
+    if user_find_by == nil
+      raise ActiveRecord::RecordNotFound
+    end
+
+      authenticated = user_find_by.authenticate(password)
+    if user_find_by && authenticated
+
+    end
+  end
+
 end

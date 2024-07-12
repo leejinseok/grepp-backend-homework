@@ -4,7 +4,8 @@ class AuthController < ApplicationController
   skip_before_action :authorized, only: [:login, :sign_up]
 
   def login
-
+    params_permit = params.permit(:email, :password)
+    AuthService.new.login(params_permit[:email], params_permit[:password])
   end
 
   def sign_up

@@ -13,4 +13,11 @@ class AuthControllerTest < ActionDispatch::IntegrationTest
     assert_response :created
   end
 
+  test "login 404 not found test" do
+    params = { email: "test@test.com", password: "password" }
+    post '/api/v1/auth/login', params: params
+    assert_equal(response.body, "404 Not Found")
+    assert_response :not_found
+  end
+
 end
