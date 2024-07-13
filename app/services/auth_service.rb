@@ -3,7 +3,6 @@
 class AuthService
 
   def sign_up(email, name, role, password)
-
     hash = BCrypt::Password.create(password)
     User.create(email: email, name: name, role: role, password: hash)
   end
@@ -18,6 +17,8 @@ class AuthService
     if authenticated == false
       raise PasswordNotCorrect
     end
+
+    user_find_by
   end
 
 end

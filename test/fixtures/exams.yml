@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  title: MyString
+  start_date_time: 2024-07-13 11:19:19
+  end_date_tie: 2024-07-13 11:19:19
+  limit_user_count: 1
+
+two:
+  title: MyString
+  start_date_time: 2024-07-13 11:19:19
+  end_date_tie: 2024-07-13 11:19:19
+  limit_user_count: 1
