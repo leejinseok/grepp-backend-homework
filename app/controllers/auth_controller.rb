@@ -1,11 +1,14 @@
-class AuthController < ApplicationController
+class AuthController < JwtController
 
   before_action :authorized
   skip_before_action :authorized, only: [:login, :sign_up]
 
   def login
     params_permit = params.permit(:email, :password)
-    AuthService.new.login(params_permit[:email], params_permit[:password])
+    user = AuthService.new.login(params_permit[:email], params_permit[:password])
+    token = JwtService.new.encode_token(user)
+    token_dto = TokenDto.new(user.id, user.email, user.name, token, nil)
+    render json: token_dto, status: :ok
   end
 
   def sign_up
@@ -20,6 +23,10 @@ class AuthController < ApplicationController
 
     user_dto_new = UserDto.new(user)
     render json: user_dto_new, status: :created
+  end
+
+  def session
+    render plain: "test"
   end
 
 end

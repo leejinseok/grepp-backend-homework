@@ -13,10 +13,10 @@ class AuthService
     if user_find_by == nil
       raise ActiveRecord::RecordNotFound
     end
-
       authenticated = user_find_by.authenticate(password)
-    if user_find_by && authenticated
 
+    if authenticated == false
+      raise PasswordNotCorrect
     end
   end
 
