@@ -10,9 +10,9 @@ class JwtController < ApplicationController
     auth_header = request.headers['Authorization']
     if auth_header.present?
       token = auth_header.split(' ')[1]
-      decoded_token = decode_token(token)
+      decoded_token = JwtService.new.decode_token(token)
       if decoded_token
-        @current_user = User.find_by(id: decoded_token['user_id'])
+        @current_user = SessionDto.new(decoded_token['id'], decoded_token['email'])
       else
         raise UnAuthorized
       end

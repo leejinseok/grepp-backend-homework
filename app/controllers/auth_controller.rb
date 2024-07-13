@@ -25,8 +25,5 @@ class AuthController < JwtController
     render json: user_dto_new, status: :created
   end
 
-  def session
-    render plain: "test"
-  end
 
 end
