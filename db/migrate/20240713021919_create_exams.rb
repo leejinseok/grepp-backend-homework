@@ -2,10 +2,11 @@ class CreateExams < ActiveRecord::Migration[7.1]
   def change
     create_table :exams do |t|
       t.string :title, null: false, default: "그렙 코딩테스트"
-      t.references :reserved_user, foreign_key: { to_table: :users, name: 'fk_exams_1' }, null: false
+      t.references :reserved_user, foreign_key: { to_table: :users, name: 'fk_exams_1' }, null: true
       t.timestamp :start_date_time, default: -> { 'NOW()' }
-      t.timestamp :end_date_tie, default: -> { 'NOW()' }
+      t.timestamp :end_date_time, default: -> { 'NOW()' }
       t.integer :limit_user_count, default: 10000
+      t.string :status, default: 'reserved'
       t.timestamps
     end
   end

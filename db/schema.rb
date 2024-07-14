@@ -16,10 +16,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_13_021919) do
 
   create_table "exams", force: :cascade do |t|
     t.string "title", default: "그렙 코딩테스트", null: false
-    t.bigint "reserved_user_id", null: false
+    t.bigint "reserved_user_id"
     t.datetime "start_date_time", precision: nil, default: -> { "now()" }
-    t.datetime "end_date_tie", precision: nil, default: -> { "now()" }
+    t.datetime "end_date_time", precision: nil, default: -> { "now()" }
     t.integer "limit_user_count", default: 10000
+    t.string "status", default: "reserved"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["reserved_user_id"], name: "index_exams_on_reserved_user_id"
