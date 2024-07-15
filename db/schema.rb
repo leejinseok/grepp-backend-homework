@@ -19,7 +19,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_13_021919) do
     t.bigint "reserved_user_id"
     t.datetime "start_date_time", precision: nil, default: -> { "now()" }
     t.datetime "end_date_time", precision: nil, default: -> { "now()" }
-    t.integer "limit_user_count", default: 10000
+    t.integer "number_of_applicants", default: 10000
     t.string "status", default: "reserved"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

@@ -2,6 +2,10 @@
 
 class ExamService
 
+  MAXIMUM_APPLICANTS_NUMBER = 50000
+  STATUS_CONFIRMED = "confirmed"
+  STATUS_REQUESTED = "requested"
+
   # 예약 가능시간 조회
   def find_available_reserve_time(date)
     times = []
@@ -17,17 +21,17 @@ class ExamService
       end_remaining_minutes = end_minutes % 60
       end_date_time = Time.parse("#{date.to_s} #{end_hours}:#{end_remaining_minutes}")
 
-      sum_of_limit_user_count = Exam.where("start_date_time <= ? AND end_date_time >= ? AND status = ?", start_date_time, end_date_time, 'confirmed')
-                                  .sum(:limit_user_count)
+      sum_of_applicants = Exam.where("start_date_time <= ? AND end_date_time >= ? AND status = ?", start_date_time, end_date_time, STATUS_CONFIRMED)
+                                    .sum(:number_of_applicants)
 
       current_time_available_info = {
         start_date_time: start_date_time,
         end_date_time: end_date_time,
-        sum_of_limit_user_count: sum_of_limit_user_count,
+        total_number_of_applicants_confirmed_between: sum_of_applicants,
         status: 'available'
       }
 
-      if sum_of_limit_user_count >= 50000
+      if sum_of_applicants >= MAXIMUM_APPLICANTS_NUMBER
         current_time_available_info[:status] = 'unavailable'
       end
 
@@ -37,10 +41,28 @@ class ExamService
   end
 
   # 예약 확정
-  def confirm(exam_id) end
+  def confirm(exam_id, executor_id)
+    executor = User.find(executor_id)
+
+    if executor.role != User::ROLE_ADMIN
+      raise PermissionDenied('Only admin has permission')
+    end
+
+    exam = Exam.find(exam_id)
+    start_date_time = exam.start_date_time
+    end_date_time = exam.end_date_time
+
+    total_number_of_applicants = total_number_of_applicants_confirmed_between(start_date_time, end_date_time)
+
+    if total_number_of_applicants + exam.number_of_applicants > MAXIMUM_APPLICANTS_NUMBER
+      raise ActionController::BadRequest.new("Maximum number of applicants is reached. Available at that time (#{start_date_time} ~ #{end_date_time}): #{MAXIMUM_APPLICANTS_NUMBER - total_number_of_applicants}")
+    end
+
+    exam.update(status: STATUS_CONFIRMED)
+  end
 
   # 시험 예약 신청
-  def reserve_request(title, reserved_user_id, start_date_time, end_date_time, limit_user_count)
+  def reserve_request(title, reserved_user_id, start_date_time, end_date_time, number_of_applicants)
     start_date_time = Time.parse(start_date_time)
     end_date_time = Time.parse(end_date_time)
 
@@ -48,16 +70,28 @@ class ExamService
       raise ActionController::BadRequest.new("Unavailable exam date time")
     end
 
-    # 해당 시간에 예약확정된 인원 + 현재 예약하려는 인원제한이 5만이 넘어가는지 확인
-    Exam.where("start_date_time <= ? AND end_date_time >= ? AND status = ?", start_date_time, end_date_time, 'confirmed')
+    if number_of_applicants > MAXIMUM_APPLICANTS_NUMBER
+      raise ActionController::BadRequest.new("Maximum number of applicants is reached")
+    end
+
+    # 해당 시간에 예약확정된 인원이 5만이 넘어가는지 확인
+    total_number_of_applicants_between = total_number_of_applicants_confirmed_between(start_date_time, end_date_time)
+    if total_number_of_applicants_between >= MAXIMUM_APPLICANTS_NUMBER
+      raise ActionController::BadRequest.new("Maximum number of applicants is reached")
+    end
+
+    # 최대 허용 인원에 현재 예약 된 인원을 차감해서 현재 수용가능한 인원을 알려줌
+    if total_number_of_applicants_between + number_of_applicants > MAXIMUM_APPLICANTS_NUMBER
+      raise ActionController::BadRequest.new("Only #{MAXIMUM_APPLICANTS_NUMBER - total_number_of_applicants_between} available at that time")
+    end
 
     Exam.create(
       title: title,
       reserved_user_id: reserved_user_id,
       start_date_time: start_date_time,
       end_date_time: end_date_time,
-      limit_user_count: limit_user_count,
-      status: 'requested'
+      number_of_applicants: number_of_applicants,
+      status: STATUS_REQUESTED
     )
   end
 
@@ -69,6 +103,13 @@ class ExamService
     three_days_later = Time.at(three_days_later.to_i)
 
     date_time >= three_days_later
+  end
+
+  # 해당 시간에 확정된 시험 정보를 토대로 응시인원 파악
+  private
+  def total_number_of_applicants_confirmed_between(start_date_time, end_date_time)
+    Exam.where("start_date_time <= ? AND end_date_time >= ? AND status = ?", start_date_time, end_date_time, STATUS_CONFIRMED)
+        .sum(:number_of_applicants)
   end
 
 end
