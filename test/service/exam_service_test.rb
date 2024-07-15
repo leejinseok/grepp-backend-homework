@@ -106,7 +106,7 @@ class ExamServiceTest < ActiveSupport::TestCase
       number_of_applicants: 30000
     )
 
-    assert_raise(PermissionDenied, 'permission denied') do
+    assert_raise(PermissionDenied, 'Permission denied') do
       ExamService.new.confirm(exam1.id, user.id)
     end
   end

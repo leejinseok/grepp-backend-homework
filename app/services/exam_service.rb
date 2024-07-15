@@ -45,7 +45,7 @@ class ExamService
     executor = User.find(executor_id)
 
     if executor.role != User::ROLE_ADMIN
-      raise PermissionDenied('Only admin has permission')
+      raise PermissionDenied, 'Permission denied'
     end
 
     exam = Exam.find(exam_id)
