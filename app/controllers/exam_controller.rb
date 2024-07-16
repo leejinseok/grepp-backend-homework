@@ -26,6 +26,25 @@ class ExamController < JwtController
     render json: { exam: ExamDto.new(exam) }, status: 201
   end
 
+  def update_exam
+    user_id = @current_user.id
+    role = @current_user.role
+
+    exam_id = params[:exam_id].to_i
+    title = params[:title]
+    start_date_time = params[:start_date_time].to_s
+    end_date_time = params[:end_date_time].to_s
+    number_of_applicants = params[:number_of_applicants].to_i
+
+    if role == User::ROLE_ADMIN
+      exam = ExamService.new.update(exam_id, title, start_date_time, end_date_time, number_of_applicants)
+    else
+      exam = ExamService.new.update_by_not_admin_user(user_id, exam_id, title, start_date_time, end_date_time, number_of_applicants)
+    end
+
+    render json: { exam: ExamDto.new(exam) }, status: 200
+  end
+
   def get_exams
     user_id = @current_user.id
     role = @current_user.role
@@ -49,6 +68,20 @@ class ExamController < JwtController
         prev_page: exams.prev_page,
       }
     }, status: 200
+  end
+
+  def delete_exam
+    user_id = @current_user.id
+    role = @current_user.role
+    exam_id = params[:exam_id].to_i
+
+    if role == User::ROLE_ADMIN
+      ExamService.new.delete(exam_id)
+    else
+      ExamService.new.delete_by_not_admin_user(user_id, exam_id)
+    end
+
+    head 200
   end
 
 end

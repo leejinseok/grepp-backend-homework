@@ -27,6 +27,23 @@ class ExamService
     exam
   end
 
+  def update_by_not_admin_user(user_id, exam_id, title, start_date_time, end_date_time, number_of_applicants)
+    exam = Exam.find(exam_id)
+    unless exam.equal_reserved_user_id(user_id)
+      raise PermissionDenied, 'Not your exam'
+    end
+
+    validate(start_date_time, end_date_time, number_of_applicants)
+
+    exam.update(
+      title: title,
+      start_date_time: start_date_time,
+      end_date_time: end_date_time,
+      number_of_applicants: number_of_applicants
+    )
+    exam
+  end
+
   # 예약 가능시간 조회
   def find_available_time(date)
     times = []
@@ -87,25 +104,6 @@ class ExamService
     start_date_time = Time.parse(start_date_time)
     end_date_time = Time.parse(end_date_time)
 
-    # unless is_datetime_three_days_later(start_date_time)
-    #   raise ActionController::BadRequest.new("Unavailable exam date time")
-    # end
-    #
-    # if number_of_applicants > MAXIMUM_APPLICANTS_NUMBER
-    #   raise ActionController::BadRequest.new("Maximum number of applicants is reached")
-    # end
-    #
-    # # 해당 시간에 예약확정된 인원이 5만이 넘어가는지 확인
-    # total_number_of_applicants_between = total_number_of_applicants_confirmed_between(start_date_time, end_date_time)
-    # if total_number_of_applicants_between >= MAXIMUM_APPLICANTS_NUMBER
-    #   raise ActionController::BadRequest.new("Maximum number of applicants is reached")
-    # end
-    #
-    # # 최대 허용 인원에 현재 예약 된 인원을 차감해서 현재 수용가능한 인원을 알려줌
-    # if total_number_of_applicants_between + number_of_applicants > MAXIMUM_APPLICANTS_NUMBER
-    #   raise ActionController::BadRequest.new("Only #{MAXIMUM_APPLICANTS_NUMBER - total_number_of_applicants_between} available at that time")
-    # end
-
     validate(start_date_time, end_date_time, number_of_applicants)
 
     Exam.create(
@@ -116,6 +114,19 @@ class ExamService
       number_of_applicants: number_of_applicants,
       status: STATUS_REQUESTED
     )
+  end
+
+  def delete(exam_id)
+    Exam.delete(exam_id)
+  end
+
+  def delete_by_not_admin_user(user_id, exam_id)
+    exam = Exam.find(exam_id)
+    if exam.equal_reserved_user_id(user_id)
+      return exam.delete
+    end
+
+    raise PermissionDenied, 'Not your exam'
   end
 
   private
@@ -143,8 +154,8 @@ class ExamService
     end
   end
 
-  private
 
+  private
   def is_datetime_three_days_later(date_time)
     # 3일 전에 예약이 가능, 즉 시험 시작 시간은 현재시간 이후로부터 3일이후부터 가능
     three_days_later = Time.now + (3 * 24 * 60 * 60) # 3일을 초로 변환
@@ -154,7 +165,6 @@ class ExamService
   end
 
   # 해당 시간에 확정된 시험 정보를 토대로 응시인원 파악
-
   private
 
   def total_number_of_applicants_confirmed_between(start_date_time, end_date_time)

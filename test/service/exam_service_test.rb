@@ -150,6 +150,7 @@ class ExamServiceTest < ActiveSupport::TestCase
     }
 
     updated = ExamService.new.update(
+
       update_exam[:exam_id],
       update_exam[:title],
       update_exam[:start_date_time],
@@ -162,5 +163,51 @@ class ExamServiceTest < ActiveSupport::TestCase
     assert_equal(update_exam[:end_date_time], updated.end_date_time)
     assert_equal(update_exam[:number_of_applicants], updated.number_of_applicants)
   end
+
+  test '예약 삭제 (일반 사용자)' do
+    user = create_sample_user
+    exam = Exam.create(
+      title: "코딩테스트 1",
+      reserved_user_id: user.id,
+      status: 'requested',
+      start_date_time: Time.parse("2024-09-15 14:00:00"),
+      end_date_time: Time.parse("2024-09-15 16:00:00"),
+      number_of_applicants: 30000
+    )
+
+    ExamService.new.delete_by_not_admin_user(user.id, exam.id)
+  end
+
+  test '예약 삭제 실패 (일반 사용자)' do
+    user = create_sample_user
+    other_user = User.create(email: "ruby@grepp.com", name: '김루비', role: 'user', password: 'password')
+
+    exam = Exam.create(
+      title: "코딩테스트 1",
+      reserved_user_id: user.id,
+      status: 'requested',
+      start_date_time: Time.parse("2024-09-15 14:00:00"),
+      end_date_time: Time.parse("2024-09-15 16:00:00"),
+      number_of_applicants: 30000
+    )
+
+    assert_raise(PermissionDenied, 'Not your exam') {
+      ExamService.new.delete_by_not_admin_user(other_user.id, exam.id)
+    }
+  end
+
+  test '예약삭제' do
+    user = create_sample_user
+    exam = Exam.create(
+      title: "코딩테스트 1",
+      reserved_user_id: user.id,
+      status: 'requested',
+      start_date_time: Time.parse("2024-09-15 14:00:00"),
+      end_date_time: Time.parse("2024-09-15 16:00:00"),
+      number_of_applicants: 30000
+    )
+    ExamService.new.delete(exam.id)
+  end
+
 
 end
