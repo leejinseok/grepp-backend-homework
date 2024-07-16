@@ -6,7 +6,7 @@ class AuthController < JwtController
   def login
     params_permit = params.permit(:email, :password)
     user = AuthService.new.login(params_permit[:email], params_permit[:password])
-    token = JwtService.new.encode_token(user)
+    token = JwtService.new.encode_token(id: user[:id], name: user[:name], email: user[:email], role: user[:role])
     token_dto = TokenDto.new(user.id, user.email, user.name, token, nil)
     render json: token_dto, status: :ok
   end

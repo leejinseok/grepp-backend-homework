@@ -69,3 +69,5 @@ end
 gem "pg"
 
 gem 'jwt'
+
+gem 'kaminari'

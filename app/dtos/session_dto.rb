@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
 class SessionDto
-  def initialize(id, email)
+  attr_reader :id, :email, :role
+
+  def initialize(id, email, role)
     @id = id
     @email = email
+    @role = role
   end
 
 end

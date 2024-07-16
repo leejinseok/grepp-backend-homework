@@ -20,7 +20,6 @@ class ExamServiceTest < ActiveSupport::TestCase
     assert_raise(ActionController::BadRequest, "bad request") do
       ExamService.new.reserve_request('그렙 코딩테스트', 1, start_date_time.to_s, end_date_time.to_s, 10000)
     end
-
   end
 
   test "예약신청" do
@@ -109,6 +108,27 @@ class ExamServiceTest < ActiveSupport::TestCase
     assert_raise(PermissionDenied, 'Permission denied') do
       ExamService.new.confirm(exam1.id, user.id)
     end
+  end
+
+  test '예약 조회' do
+    user = create_sample_user
+    for i in 0..20
+      Exam.create(
+        title: "코딩테스트 #{i}",
+        reserved_user_id: user.id,
+        status: 'requested',
+        start_date_time: Time.parse("2024-07-15 14:00:00"),
+        end_date_time: Time.parse("2024-07-15 16:00:00"),
+        number_of_applicants: 30000
+      )
+    end
+
+    exams = ExamService.new.find_all_my_exam(user.id, 0, 10)
+    assert_equal(3, exams.total_pages)
+    assert_equal(1, exams.current_page)
+    assert_equal(2, exams.next_page)
+    assert_nil(exams.prev_page)
+    assert_equal(21, exams.total_count)
   end
 
 end

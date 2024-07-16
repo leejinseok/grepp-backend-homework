@@ -6,6 +6,15 @@ class ExamService
   STATUS_CONFIRMED = "confirmed"
   STATUS_REQUESTED = "requested"
 
+  def find_all_my_exam(user_id, page, page_size)
+    Exam.order(id: :desc).where(reserved_user_id: user_id).page(page).per(page_size)
+  end
+
+  def find_all_exam(page, page_size)
+    Exam.order(id: :desc).page(page).per(page_size)
+  end
+
+
   # 예약 가능시간 조회
   def find_available_reserve_time(date)
     times = []

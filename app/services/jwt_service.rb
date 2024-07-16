@@ -10,7 +10,7 @@ class JwtService
 
   def decode_token(token)
     begin
-      test = JWT.decode(token, SECRET_KEY, true, algorithm: 'HS256')[0]
+      JWT.decode(token, SECRET_KEY, true, algorithm: 'HS256')[0]
     rescue JWT::DecodeError
       nil
     end

@@ -10,6 +10,8 @@ Rails.application.routes.draw do
   post "/api/v1/auth/login" => "auth#login"
   get "/api/v1/auth/session" => "auth#session"
 
+  get "/api/v1/exams" => "exam#get_exams"
+
   # Defines the root path route ("/")
   # root "posts#index"
 end
