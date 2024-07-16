@@ -2,7 +2,58 @@ require "test_helper"
 
 class ExamControllerTest < ActionDispatch::IntegrationTest
 
-  test "예약 조회 컨트롤러 (일반 사용자)" do
+  def create_sample_user
+    User.create(email: "test@grepp.com", name: '김그렙', role: 'user', password: "password")
+  end
+
+  def generate_token(user)
+    JwtService.new.encode_token(id: user[:id], name: user[:name], email: user[:email], role: user[:role])
+  end
+
+  test '예약가능 시간조회 (컨트롤러)' do
+    user = create_sample_user
+    token = generate_token(user)
+
+    Exam.create(
+      title: "코딩테스트 1",
+      reserved_user_id: user.id,
+      status: 'confirmed',
+      start_date_time: Time.parse("2024-07-15 04:00:00"),
+      end_date_time: Time.parse("2024-07-15 06:00:00"),
+      number_of_applicants: 50000
+    )
+
+    params = {date: '2024-07-15'}
+    get '/api/v1/exams/available_times', params: params, headers: { Authorization: "Bearer #{token}" }
+    body = JSON.parse(response.body)
+
+    available_times_count = 0
+    body['available_times'].each do |time|
+      if time['status'] == 'available'
+        available_times_count += 1
+      end
+    end
+
+    assert_equal(44, available_times_count)
+    assert_response :success
+  end
+
+  test '예약 신청 (컨트롤러)' do
+    user = create_sample_user
+    token = generate_token(user)
+    params = {
+      title: "코딩테스트 1",
+      reserved_user_id: user.id,
+      start_date_time: Time.parse("2024-10-01 14:00:00"),
+      end_date_time: Time.parse("2024-10-01 16:00:00"),
+      number_of_applicants: 30000
+    }
+    post '/api/v1/exams/request', params: params, headers: {  Authorization: "Bearer #{token}" }
+    body = JSON.parse(response.body)
+    puts body
+  end
+
+  test "예약 조회 일반사용자 (컨트롤러)" do
     user = User.create(email: "test@grepp.com", name: '김그렙', role: 'user', password: "password")
     for i in 0..20
       Exam.create(
@@ -14,7 +65,7 @@ class ExamControllerTest < ActionDispatch::IntegrationTest
         number_of_applicants: 30000
       )
     end
-    token = JwtService.new.encode_token(id: user[:id], name: user[:name], email: user[:email], role: user[:role])
+    token = generate_token(user)
     params = {page: 0, page_size: 10}
     get '/api/v1/exams', params: params, headers: { Authorization: "Bearer #{token}" }
     body = JSON.parse(response.body)
@@ -27,7 +78,7 @@ class ExamControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "예약 조회 컨트롤러 (관리자)" do
+  test "예약 조회 관리자 (컨트롤러)" do
     admin_user = User.create(email: "admin@grepp.com", name: '관리자', role: 'admin', password: "password")
     user = User.create(email: "test@grepp.com", name: '김그렙', role: 'user', password: "password")
     for i in 0..20
@@ -41,10 +92,29 @@ class ExamControllerTest < ActionDispatch::IntegrationTest
       )
     end
 
-    token = JwtService.new.encode_token(id: admin_user[:id], name: admin_user[:name], email: admin_user[:email], role: admin_user[:role])
+    token = generate_token(admin_user)
     params = {page: 0, page_size: 10}
     get '/api/v1/exams', params: params, headers: { Authorization: "Bearer #{token}" }
     assert_response :success
   end
+
+  test '예약 확정 (컨트롤러)' do
+    admin_user = User.create(email: "admin@grepp.com", name: '관리자', role: 'admin', password: "password")
+    token = generate_token(admin_user)
+    user = User.create(email: "test@grepp.com", name: '김그렙', role: 'user', password: "password")
+
+    exam = Exam.create(
+      title: "코딩테스트 1",
+      reserved_user_id: user.id,
+      status: 'requested',
+      start_date_time: Time.parse("2024-07-15 14:00:00"),
+      end_date_time: Time.parse("2024-07-15 16:00:00"),
+      number_of_applicants: 30000
+    )
+
+    patch "/api/v1/exams/#{exam.id}/confirm", headers: { Authorization: "Bearer #{token}" }
+    assert_response :success
+  end
+
 
 end

@@ -11,6 +11,9 @@ Rails.application.routes.draw do
   get "/api/v1/auth/session" => "auth#session"
 
   get "/api/v1/exams" => "exam#get_exams"
+  get "/api/v1/exams/available_times" => "exam#get_available_time"
+  post "/api/v1/exams/request" => "exam#reserve_request"
+  patch "/api/v1/exams/:exam_id/confirm" => "exam#confirm"
 
   # Defines the root path route ("/")
   # root "posts#index"

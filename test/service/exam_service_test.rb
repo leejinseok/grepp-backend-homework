@@ -26,7 +26,6 @@ class ExamServiceTest < ActiveSupport::TestCase
     start_date_time = Time.now + (3 * 24 * 60 * 60)
     end_date_time = start_date_time + (2 * 60 * 60)
     exam = ExamService.new.reserve_request('그렙 코딩테스트', 1, start_date_time.to_s, end_date_time.to_s, 10000)
-    puts exam
   end
 
   test '예약가능 시간 조회' do
@@ -50,7 +49,7 @@ class ExamServiceTest < ActiveSupport::TestCase
     )
 
     date = Date.parse('2024-07-15')
-    ExamService.new.find_available_reserve_time(date)
+    ExamService.new.find_available_time(date)
   end
 
   test '예약확정 실패 (응시인원 초과)' do
@@ -75,7 +74,7 @@ class ExamServiceTest < ActiveSupport::TestCase
     admin_user = create_sample_admin_user
     ExamService.new.confirm(exam1.id, admin_user.id)
     assert_raise(ActionController::BadRequest, "bad request") do
-      ExamService.new.confirm(exam2.id, admin_user.id.id)
+      ExamService.new.confirm(exam2.id, admin_user.id)
     end
   end
 
@@ -123,12 +122,45 @@ class ExamServiceTest < ActiveSupport::TestCase
       )
     end
 
-    exams = ExamService.new.find_all_my_exam(user.id, 0, 10)
+    exams = ExamService.new.find_all_exam_by_user_id(user.id, 0, 10)
     assert_equal(3, exams.total_pages)
     assert_equal(1, exams.current_page)
     assert_equal(2, exams.next_page)
     assert_nil(exams.prev_page)
     assert_equal(21, exams.total_count)
+  end
+
+  test '예약 수정' do
+    user = create_sample_user
+    exam = Exam.create(
+      title: "코딩테스트 1",
+      reserved_user_id: user.id,
+      status: 'requested',
+      start_date_time: Time.parse("2024-09-15 14:00:00"),
+      end_date_time: Time.parse("2024-09-15 16:00:00"),
+      number_of_applicants: 30000
+    )
+
+    update_exam = {
+      exam_id: exam.id,
+      title: '코딩테스트 1-1',
+      start_date_time: Time.parse("2024-09-15 16:00:00"),
+      end_date_time: Time.parse("2024-09-15 18:00:00"),
+      number_of_applicants: 30000
+    }
+
+    updated = ExamService.new.update(
+      update_exam[:exam_id],
+      update_exam[:title],
+      update_exam[:start_date_time],
+      update_exam[:end_date_time],
+      update_exam[:number_of_applicants],
+    )
+
+    assert_equal(update_exam[:title], updated.title)
+    assert_equal(update_exam[:start_date_time], updated.start_date_time)
+    assert_equal(update_exam[:end_date_time], updated.end_date_time)
+    assert_equal(update_exam[:number_of_applicants], updated.number_of_applicants)
   end
 
 end
