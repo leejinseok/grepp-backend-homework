@@ -39,7 +39,7 @@ class ExamControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_equal(44, available_times_count)
-    assert_response :success
+    assert_response 200
   end
 
   test '예약 신청 (컨트롤러)' do
@@ -53,8 +53,7 @@ class ExamControllerTest < ActionDispatch::IntegrationTest
       number_of_applicants: 30000
     }
     post '/api/v1/exams/request', params: params, headers: {  Authorization: "Bearer #{token}" }
-    body = JSON.parse(response.body)
-    puts body
+    assert_response 201
   end
 
   test "예약 조회 일반사용자 (컨트롤러)" do
@@ -79,7 +78,7 @@ class ExamControllerTest < ActionDispatch::IntegrationTest
     assert_equal(1, body["page"]["current_page"])
     assert_equal(21, body["page"]["total_count"])
     assert_nil(body["page"]["prev_page"])
-    assert_response :success
+    assert_response 200
   end
 
   test "예약 조회 관리자 (컨트롤러)" do
@@ -99,7 +98,7 @@ class ExamControllerTest < ActionDispatch::IntegrationTest
     token = generate_token(admin_user)
     params = {page: 0, page_size: 10}
     get '/api/v1/exams', params: params, headers: { Authorization: "Bearer #{token}" }
-    assert_response :success
+    assert_response 200
   end
 
   test '예약 확정 (컨트롤러)' do
@@ -117,7 +116,7 @@ class ExamControllerTest < ActionDispatch::IntegrationTest
     )
 
     patch "/api/v1/exams/#{exam.id}/confirm", headers: { Authorization: "Bearer #{token}" }
-    assert_response :success
+    assert_response 200
   end
 
   test '예약 변경 (일반 사용자)' do
