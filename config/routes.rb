@@ -8,7 +8,6 @@ Rails.application.routes.draw do
 
   post "/api/v1/auth/sign_up" => "auth#sign_up"
   post "/api/v1/auth/login" => "auth#login"
-  get "/api/v1/auth/session" => "auth#session"
 
   get "/api/v1/exams" => "exam#get_exams"
   get "/api/v1/exams/available_times" => "exam#get_available_time"
