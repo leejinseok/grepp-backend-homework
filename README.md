@@ -123,6 +123,29 @@ services:
 
 > 로그인 이후에 전달 받은 token 값을 Authorize를 통하여 활용할 수 있다. 
 
+## 🏃Run Application
+
+DB를 위한 docker 실행
+
+```sh
+docker-compose -f docker/docker-compose.yml up
+```
+
+초기 DB 설정
+```sh
+rails db:migrate
+```
+
+테스트 코드 실행
+```sh
+# RAILS_ENV=test (필요시 test 환경변수 설정)
+rails test
+```
+
+Application 실행 
+```sh
+rails server
+```
 
 ## 👷 Todo
  
