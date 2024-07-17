@@ -115,6 +115,15 @@ services:
 
 ```
 
+## Swagger Docs
+
+![](swagger/docs/img_01.png)
+
+![](swagger/docs/img_02.png)
+
+> 로그인 이후에 전달 받은 token 값을 Authorize를 통하여 활용할 수 있다. 
+
+
 ## 👷 Todo
  
 - [x] 로그인
@@ -140,3 +149,4 @@ services:
   - [x] 고객
   - [x] 어드민
   - [x] 테스트 코드
+- [x] swagger
