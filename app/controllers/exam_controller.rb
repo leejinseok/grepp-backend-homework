@@ -12,7 +12,7 @@ class ExamController < JwtController
     date = params[:date]
     date = Date.parse(date.to_s)
     available_times = ExamService.new.find_available_time(date)
-    render json: { available_times: available_times }, status: 200
+    render json: available_times , status: 200
   end
 
   def reserve_request
@@ -23,7 +23,7 @@ class ExamController < JwtController
     number_of_applicants = params[:number_of_applicants].to_i
 
     exam = ExamService.new.reserve_request(title, user_id, start_date_time, end_date_time, number_of_applicants)
-    render json: { exam: ExamDto.new(exam) }, status: 201
+    render json: ExamDto.new(exam) , status: 201
   end
 
   def update_exam
@@ -42,7 +42,7 @@ class ExamController < JwtController
       exam = ExamService.new.update_by_not_admin_user(user_id, exam_id, title, start_date_time, end_date_time, number_of_applicants)
     end
 
-    render json: { exam: ExamDto.new(exam) }, status: 200
+    render json: ExamDto.new(exam), status: 200
   end
 
   def get_exams

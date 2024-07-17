@@ -1,0 +1,147 @@
+---
+openapi: 3.0.1
+info:
+  title: Grepp Exam Apply API V1
+  version: v1
+components:
+  securitySchemes:
+    bearerAuth:
+      type: apiKey
+      name: Authorization
+      schema: Bearer
+      bearerFormat: JWT
+      description: Bearer {Your Token}
+      in: header
+security:
+  bearerAuth: []
+paths:
+  "/api/v1/auth/login":
+    post:
+      summary: 로그인
+      tags:
+      - Authentication
+      parameters: []
+      security:
+      - Bearer: {}
+      responses:
+        '200':
+          description: successful login
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  default: grepp@grepp.com
+                password:
+                  type: string
+                  default: password
+              required:
+              - email
+              - password
+  "/api/v1/auth/sign_up":
+    post:
+      summary: 회원가입
+      tags:
+      - Authentication
+      parameters: []
+      responses:
+        '201':
+          description: user created
+        '400':
+          description: bad request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  default: grepp@grepp.com
+                name:
+                  type: string
+                  default: 김그렙
+                role:
+                  type: string
+                  default: user
+                password:
+                  type: string
+                  default: password
+              required:
+              - email
+              - name
+              - role
+              - password
+  "/api/v1/exams/request":
+    post:
+      summary: 시험 예약 신청
+      tags:
+      - Exam
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '201':
+          description: successful created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    default: 1
+                  title:
+                    type: string
+                    default: 코딩테스트
+                  reserved_user_id:
+                    type: integer
+                    default: 1
+                  start_date_time:
+                    type: string
+                    default: '2024-09-15 12:00:00'
+                  end_date_time:
+                    type: string
+                    default: '2024-09-15 14:00:00'
+                  number_of_applicants:
+                    type: integer
+                required:
+                - title
+                - start_date_time
+                - end_date_time
+                - number_of_applicants
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  default: 코딩테스트
+                start_date_time:
+                  type: string
+                  default: '2024-09-15 12:00:00'
+                end_date_time:
+                  type: string
+                  default: '2024-09-15 14:00:00'
+                number_of_applicants:
+                  type: integer
+                  default: 10000
+              required:
+              - title
+              - start_date_time
+              - end_date_time
+              - number_of_applicants
+servers:
+- url: http://{defaultHost}:3000
+  variables:
+    defaultHost:
+      default: localhost

@@ -4,8 +4,10 @@ class ApplicationController < ActionController::Base
   rescue_from PasswordNotCorrect, with: :auth_failed
   rescue_from PermissionDenied, with: :auth_failed
 
-  def record_not_found
-    render plain: '404 Not Found', status: :not_found
+  protect_from_forgery with: :null_session
+
+  def record_not_found(exception)
+    render json: {  message: exception.message }, status: :not_found
   end
 
   def routing_error

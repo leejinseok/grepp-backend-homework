@@ -1,0 +1,3 @@
+class SwaggerController < ApplicationController
+
+end

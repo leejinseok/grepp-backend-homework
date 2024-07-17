@@ -21,7 +21,8 @@ class AuthControllerTest < ActionDispatch::IntegrationTest
   test "login 404 not found test" do
     params = { email: "test@test.com", password: "password" }
     post '/api/v1/auth/login', params: params
-    assert_equal(response.body, "404 Not Found")
+    body = JSON.parse(response.body)
+    assert_equal( "No exist email", body['message'])
     assert_response 404
   end
 

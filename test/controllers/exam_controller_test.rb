@@ -32,7 +32,7 @@ class ExamControllerTest < ActionDispatch::IntegrationTest
     body = JSON.parse(response.body)
 
     available_times_count = 0
-    body['available_times'].each do |time|
+    body.each do |time|
       if time['status'] == 'available'
         available_times_count += 1
       end
@@ -142,10 +142,10 @@ class ExamControllerTest < ActionDispatch::IntegrationTest
     patch "/api/v1/exams/#{exam.id}", params: params,  headers: { Authorization: "Bearer #{token}" }
     body = JSON.parse(response.body)
 
-    assert_equal(params[:title], body["exam"]["title"])
-    assert_equal(params[:start_date_time], body["exam"]["start_date_time"])
-    assert_equal(params[:end_date_time], body["exam"]["end_date_time"])
-    assert_equal(params[:number_of_applicants], body["exam"]["number_of_applicants"])
+    assert_equal(params[:title], body["title"])
+    assert_equal(params[:start_date_time], body["start_date_time"])
+    assert_equal(params[:end_date_time], body["end_date_time"])
+    assert_equal(params[:number_of_applicants], body["number_of_applicants"])
     assert_response 200
   end
 
@@ -174,10 +174,10 @@ class ExamControllerTest < ActionDispatch::IntegrationTest
     patch "/api/v1/exams/#{exam.id}", params: params,  headers: { Authorization: "Bearer #{token}" }
     body = JSON.parse(response.body)
 
-    assert_equal(params[:title], body["exam"]["title"])
-    assert_equal(params[:start_date_time], body["exam"]["start_date_time"])
-    assert_equal(params[:end_date_time], body["exam"]["end_date_time"])
-    assert_equal(params[:number_of_applicants], body["exam"]["number_of_applicants"])
+    assert_equal(params[:title], body["title"])
+    assert_equal(params[:start_date_time], body["start_date_time"])
+    assert_equal(params[:end_date_time], body["end_date_time"])
+    assert_equal(params[:number_of_applicants], body["number_of_applicants"])
     assert_response 200
   end
 

@@ -10,7 +10,7 @@ class AuthService
   def login(email, password)
     user_find_by = User.find_by(email: email)
     if user_find_by == nil
-      raise ActiveRecord::RecordNotFound
+      raise ActiveRecord::RecordNotFound, 'No exist email'
     end
       authenticated = user_find_by.authenticate(password)
 

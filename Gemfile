@@ -71,3 +71,6 @@ gem "pg"
 gem 'jwt'
 
 gem 'kaminari'
+
+gem 'rspec-rails'
+gem 'rswag'
