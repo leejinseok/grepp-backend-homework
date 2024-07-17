@@ -93,10 +93,11 @@ class ExamService
     total_number_of_applicants = total_number_of_applicants_confirmed_between(start_date_time, end_date_time)
 
     if total_number_of_applicants + exam.number_of_applicants > MAXIMUM_APPLICANTS_NUMBER
-      raise ActionController::BadRequest.new("Maximum number of applicants is reached. Available at that time (#{start_date_time} ~ #{end_date_time}): #{MAXIMUM_APPLICANTS_NUMBER - total_number_of_applicants}")
+      raise ActionController::BadRequest, "Maximum number of applicants is reached. Available at that time (#{start_date_time} ~ #{end_date_time}): #{MAXIMUM_APPLICANTS_NUMBER - total_number_of_applicants}"
     end
 
     exam.update(status: STATUS_CONFIRMED)
+    exam
   end
 
   # 시험 예약 신청
@@ -134,23 +135,23 @@ class ExamService
   def validate(start_date_time, end_date_time, number_of_applicants)
     # 3일 확인
     unless is_datetime_three_days_later(start_date_time)
-      raise ActionController::BadRequest.new("Unavailable exam date time")
+      raise ActionController::BadRequest, "Unavailable exam date time"
     end
 
     # 요청하는 응시 인원수가 5만명을 초과하는가
     if number_of_applicants > MAXIMUM_APPLICANTS_NUMBER
-      raise ActionController::BadRequest.new("Maximum number of applicants is reached")
+      raise ActionController::BadRequest, "Maximum number of applicants is reached"
     end
 
     # 해당 시간에 예약확정된 인원이 5만이 넘어가는지 확인
     total_number_of_applicants_between = total_number_of_applicants_confirmed_between(start_date_time, end_date_time)
     if total_number_of_applicants_between >= MAXIMUM_APPLICANTS_NUMBER
-      raise ActionController::BadRequest.new("Maximum number of applicants is reached")
+      raise ActionController::BadRequest, "Maximum number of applicants is reached"
     end
 
     # 최대 허용 인원에 현재 예약 된 인원을 차감해서 현재 수용가능한 인원을 알려줌
     if total_number_of_applicants_between + number_of_applicants > MAXIMUM_APPLICANTS_NUMBER
-      raise ActionController::BadRequest.new("Only #{MAXIMUM_APPLICANTS_NUMBER - total_number_of_applicants_between} available at that time")
+      raise ActionController::BadRequest, "Only #{MAXIMUM_APPLICANTS_NUMBER - total_number_of_applicants_between} available at that time"
     end
   end
 

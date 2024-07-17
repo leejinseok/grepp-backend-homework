@@ -4,8 +4,8 @@ class ExamController < JwtController
   def confirm
     exam_id = params[:exam_id].to_i
     user_id = @current_user.id
-    ExamService.new.confirm(exam_id, user_id)
-    head 200
+    updated = ExamService.new.confirm(exam_id, user_id)
+    render json: ExamDto.new(updated), status: 200
   end
 
   def get_available_time

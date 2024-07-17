@@ -21,10 +21,6 @@ Rails.application.routes.draw do
   mount Rswag::Api::Engine => '/api-docs'
   mount Rswag::Ui::Engine => '/api-docs'
 
-  # get '/api-docs' => 'swagger#index'
-  # mount Rswag::Ui::Engine => '/api-docs'
-  # mount Rswag::Api::Engine => '/api-docs'
-
   # Defines the root path route ("/")
   # root "posts#index"
 end

@@ -6,7 +6,7 @@ class CreateExams < ActiveRecord::Migration[7.1]
       t.timestamp :start_date_time, default: -> { 'NOW()' }
       t.timestamp :end_date_time, default: -> { 'NOW()' }
       t.integer :number_of_applicants, default: 10000
-      t.string :status, default: 'reserved'
+      t.string :status, default: 'requested'
       t.timestamps
     end
   end

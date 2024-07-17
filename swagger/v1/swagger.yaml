@@ -77,6 +77,44 @@ paths:
               - name
               - role
               - password
+  "/api/v1/exams/available_times":
+    get:
+      summary: 예약 가능시간 조회
+      tags:
+      - Exam
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: date
+        in: query
+        schema:
+          type: string
+          format: date
+          default: '2024-09-15'
+      responses:
+        '201':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    start_date_time:
+                      type: string
+                      default: '2024-09-15 12:00:00'
+                    end_date_time:
+                      type: string
+                      default: '2024-09-15 14:00:00'
+                    total_number_of_applicants_confirmed_between:
+                      type: integer
+                      default: 10000
+                    status:
+                      type: string
+                      default: available
+        '401':
+          description: unauthorized
   "/api/v1/exams/request":
     post:
       summary: 시험 예약 신청
@@ -140,6 +178,176 @@ paths:
               - start_date_time
               - end_date_time
               - number_of_applicants
+  "/api/v1/exams":
+    get:
+      summary: 예약 조회
+      tags:
+      - Exam
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 0
+      - name: page_size
+        in: query
+        schema:
+          type: integer
+          default: 10
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          default: 1
+                        title:
+                          type: string
+                          default: 코딩테스트
+                  page:
+                    type: object
+                    properties:
+                      total_pages:
+                        type: integer
+                      current_page:
+                        type: integer
+                      total_count:
+                        type: integer
+                      next_page:
+                        type: integer
+                      prev_page:
+                        type: integer
+        '401':
+          description: unauthorized
+  "/api/v1/exams/{exam_id}":
+    patch:
+      summary: 예약 변경
+      tags:
+      - Exam
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: exam_id
+        in: path
+        schema:
+          type: integer
+        required: true
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exam_id:
+                    type: integer
+                    default: 1
+                  title:
+                    type: string
+                    default: 코딩테스트 1 (변경)
+                  start_date_time:
+                    type: string
+                    default: '2024-09-15 12:00:00'
+                  end_date_time:
+                    type: string
+                    default: '2024-09-15 14:00:00'
+                  number_of_applicants:
+                    type: integer
+                  status:
+                    type: string
+                    enum:
+                    - requested
+                    - confirmed
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  default: 코딩테스트 1 (변경)
+                start_date_time:
+                  type: string
+                  default: '2024-09-15 12:00:00'
+                end_date_time:
+                  type: string
+                  default: '2024-09-15 14:00:00'
+                number_of_applicants:
+                  type: integer
+    delete:
+      summary: 예약 삭제
+      tags:
+      - Exam
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: exam_id
+        in: path
+        schema:
+          type: integer
+        required: true
+      responses:
+        '200':
+          description: success
+        '401':
+          description: unauthorized
+  "/api/v1/exams/{exam_id}/confirm":
+    patch:
+      summary: 예약 확정
+      tags:
+      - Exam
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: exam_id
+        in: path
+        schema:
+          type: integer
+        required: true
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exam_id:
+                    type: integer
+                    default: 1
+                  title:
+                    type: string
+                    default: 코딩테스트 1
+                  start_date_time:
+                    type: string
+                    default: '2024-09-15 12:00:00'
+                  end_date_time:
+                    type: string
+                    default: '2024-09-15 14:00:00'
+                  number_of_applicants:
+                    type: integer
+                  status:
+                    type: string
+                    enum:
+                    - requested
+                    - confirmed
+        '401':
+          description: unauthorized
 servers:
 - url: http://{defaultHost}:3000
   variables:

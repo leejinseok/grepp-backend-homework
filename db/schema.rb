@@ -20,7 +20,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_13_021919) do
     t.datetime "start_date_time", precision: nil, default: -> { "now()" }
     t.datetime "end_date_time", precision: nil, default: -> { "now()" }
     t.integer "number_of_applicants", default: 10000
-    t.string "status", default: "reserved"
+    t.string "status", default: "requested"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["reserved_user_id"], name: "index_exams_on_reserved_user_id"
